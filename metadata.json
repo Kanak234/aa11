@@ -1,0 +1,8 @@
+{
+  "name": "Ira AI OS",
+  "description": "A futuristic, spiritual, and highly advanced AI operating system inspired by Goddess Saraswati.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
