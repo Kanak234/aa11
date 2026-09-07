@@ -1,0 +1,43 @@
+name: CI
+
+# This workflow protects the existing application by validating the same
+# dependency installation, type-check, and production build steps that a
+# maintainer should run before accepting a change. It does not alter runtime
+# behavior and it does not require secrets.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      # Pin the runtime family so local and CI behavior remain predictable.
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # npm ci uses the committed lockfile instead of silently resolving new
+      # dependency versions during CI, which makes failures reproducible.
+      - name: Install dependencies
+        run: npm ci
+
+      # The existing lint script is a TypeScript compiler check. Running it
+      # here catches type regressions without changing application code.
+      - name: Type-check
+        run: npm run lint
+
+      # A production build is the strongest non-invasive verification
+      # available from the repository configuration itself.
+      - name: Production build
+        run: npm run build
